@@ -5,8 +5,6 @@ import com.tsarenko.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -15,12 +13,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(long id) {
-        return new User(id, "", "", "", LocalDate.now());
+        return repository.getUserById(id);
     }
 
     @Override
     public long createOrUpdateUser(User user) {
-        return 0;
+        return repository.createUser(user);
     }
 
 
