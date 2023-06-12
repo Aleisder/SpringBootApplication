@@ -6,9 +6,20 @@ public interface UserRepository {
 
     User getUserById(long id);
 
-    long createUser(User user);
+    Long createUser(User user);
 
-    long updateUser(User user);
+    Long updateUser(User user);
 
+    boolean isExist(long id);
+
+    void deleteUser(long id);
+
+    byte[] getUserAvatar(long id);
+
+    void uploadAvatar();
+
+    void deleteAvatar();
+
+    long saveFullUser();
 
 }

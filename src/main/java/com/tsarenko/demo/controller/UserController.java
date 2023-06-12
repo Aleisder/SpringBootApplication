@@ -31,7 +31,7 @@ public class UserController {
      * Возвращаемое значение: http-код 200 и id пользователя или код 404, если пользователь с указанным id отсутствует.
      */
     @PostMapping("/profile")
-    private long createOrUpdateUser(@RequestBody User user) {
+    private Long createOrUpdateUser(@RequestBody User user) {
         return service.createOrUpdateUser(user);
     }
 
@@ -40,9 +40,9 @@ public class UserController {
      * Возвращаемое значение: http-код 200, если удаление данных прошло успешно, или код 404, если пользователь с указанным id не найден.
      * При удалении профиля так же должна удаляться связанная с ним аватарка пользователя, если она загружена.
      */
-    @DeleteMapping("/profile/{id}")
-    private void deleteUser(@PathVariable("id") long id) {
-
+    @DeleteMapping("/profile")
+    private void deleteUser(@RequestParam long id) {
+        service.deleteUser(id);
     }
 
     /**

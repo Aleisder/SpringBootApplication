@@ -26,6 +26,4 @@ public class User {
         this.dateOfBirth = dateOfBirth;
     }
 
-
-
 }

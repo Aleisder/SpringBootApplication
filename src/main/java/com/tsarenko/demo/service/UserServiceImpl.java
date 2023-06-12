@@ -18,13 +18,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public long createOrUpdateUser(User user) {
+        if (!(user.getId() == null)) {
+            if(repository.isExist(user.getId())) {
+                return repository.updateUser(user);
+            } else {
+                throw new RuntimeException("id " + user.getId() + "is not found in table");
+            }
+        }
         return repository.createUser(user);
     }
 
-
     @Override
     public void deleteUser(long id) {
-
+        if (repository.isExist(id)) {
+            repository.deleteUser(id);
+        }
     }
 
     @Override
