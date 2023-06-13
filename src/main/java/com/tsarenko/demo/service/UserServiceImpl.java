@@ -3,7 +3,12 @@ package com.tsarenko.demo.service;
 import com.tsarenko.demo.model.User;
 import com.tsarenko.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -12,37 +17,35 @@ public class UserServiceImpl implements UserService {
     private UserRepository repository;
 
     @Override
-    public User getUser(long id) {
-        return repository.getUserById(id);
+    public ResponseEntity<User> getUser(long id) {
+        var user = repository.getUserById(id);
+        return user.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(user);
     }
 
     @Override
-    public long createOrUpdateUser(User user) {
-        if (!(user.getId() == null)) {
-            if(repository.isExist(user.getId())) {
-                return repository.updateUser(user);
-            } else {
-                throw new RuntimeException("id " + user.getId() + "is not found in table");
-            }
+    public ResponseEntity<Long> createOrUpdateUser(User user) {
+        if (user.getId() == null) {
+            Long id = repository.createUser(user);
+            return ResponseEntity.ok(id);
         }
-        return repository.createUser(user);
+        return ResponseEntity.ok(99999L);
     }
 
     @Override
-    public void deleteUser(long id) {
-        if (repository.isExist(id)) {
-            repository.deleteUser(id);
-        }
+    public ResponseEntity<Long> deleteUser(long id) {
+        // number of rows affected
+        int success = repository.deleteUser(id);
+        return success == 1 ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @Override
     public byte[] getUserAvatar(long id) {
-        return new byte[0];
+        return repository.getUserAvatar(id);
     }
 
     @Override
-    public void uploadAvatar(long id, byte[] file) {
-
+    public void uploadAvatar(long id, MultipartFile file) throws IOException {
+        repository.uploadAvatar(id, file.getBytes());
     }
 
     @Override
