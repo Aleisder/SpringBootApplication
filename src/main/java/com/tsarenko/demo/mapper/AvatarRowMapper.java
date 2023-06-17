@@ -1,4 +1,4 @@
-package com.tsarenko.demo.repository.util;
+package com.tsarenko.demo.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 

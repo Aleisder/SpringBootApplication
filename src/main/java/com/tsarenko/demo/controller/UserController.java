@@ -1,21 +1,26 @@
 package com.tsarenko.demo.controller;
 
 import com.tsarenko.demo.model.User;
+import com.tsarenko.demo.model.UserDTO;
 import com.tsarenko.demo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 public class UserController {
 
-    @Autowired
-    private UserService service;
+    private final UserService service;
+
+    public UserController(UserService service) {
+        this.service = service;
+    }
 
     /**
      * 1. GET /api/profile - получение профиля пользователя.
@@ -24,7 +29,7 @@ public class UserController {
      * или код 404, если пользователь с указанным id не найден
      */
     @GetMapping("/profile")
-    private ResponseEntity<User> getUser(@RequestParam long id) {
+    private UserDTO getUser(@RequestParam long id) {
         return service.getUser(id);
     }
 
@@ -35,7 +40,7 @@ public class UserController {
      * Возвращаемое значение: http-код 200 и id пользователя или код 404, если пользователь с указанным id отсутствует.
      */
     @PostMapping("/profile")
-    private ResponseEntity<Long> createOrUpdateUser(@RequestBody User user) {
+    private Optional<Long> createOrUpdateUser(@Valid @RequestBody User user) {
         return service.createOrUpdateUser(user);
     }
 
@@ -45,7 +50,7 @@ public class UserController {
      * При удалении профиля так же должна удаляться связанная с ним аватарка пользователя, если она загружена.
      */
     @DeleteMapping("/profile")
-    private ResponseEntity<Long> deleteUser(@RequestParam long id) {
+    private Long deleteUser(@RequestParam long id) {
         return service.deleteUser(id);
     }
 
@@ -80,8 +85,8 @@ public class UserController {
      * или код 404, если пользователь с указанным id не найден.
      */
     @DeleteMapping("/avatar")
-    private void deleteAvatar(@RequestParam long id) {
-        service.deleteAvatar(id);
+    private Long deleteAvatar(@RequestParam long id) {
+        return service.deleteAvatar(id);
     }
 
     /**
@@ -90,8 +95,11 @@ public class UserController {
      * то выполняется обновление существующего профиля, если id осутствует - создаётся новый профиль.
      * Возвращаемое значение: http-код 200 и id пользователя или код 404, если пользователь с указанным id отсутствует.
      */
-    @PostMapping("/fullprofile")
-    private long saveFullUser(@RequestBody User user) {
+    @PostMapping(
+            value = "/fullprofile",
+            produces = { MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE}
+    )
+    private Long saveFullUser(@RequestBody User user) {
         return service.saveFullUser(user);
     }
 

@@ -1,41 +1,53 @@
 package com.tsarenko.demo.service;
 
+import com.tsarenko.demo.exception.UserNotFoundException;
+import com.tsarenko.demo.mapper.UserDTOMapper;
 import com.tsarenko.demo.model.User;
-import com.tsarenko.demo.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import com.tsarenko.demo.model.UserDTO;
+import com.tsarenko.demo.repository.UserDao;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository repository;
+    private final UserDao repository;
+    private final UserDTOMapper userDTOMapper;
 
-    @Override
-    public ResponseEntity<User> getUser(long id) {
-        var user = repository.getUserById(id);
-        return user.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(user);
+    public UserServiceImpl(UserDao repository, UserDTOMapper userDTOMapper) {
+        this.repository = repository;
+        this.userDTOMapper = userDTOMapper;
     }
 
     @Override
-    public ResponseEntity<Long> createOrUpdateUser(User user) {
+    public UserDTO getUser(long id) {
+        return repository
+                .getUserById(id)
+                .map(userDTOMapper)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User with id %s not found".formatted(id)
+                ));
+    }
+
+    @Override
+    public Optional<Long> createOrUpdateUser(User user) {
         if (user.getId() == null) {
-            Long id = repository.createUser(user);
-            return ResponseEntity.ok(id);
+            return Optional.of(repository.insertUser(user)) ;
         }
-        return ResponseEntity.ok(99999L);
+        return repository
+                .updateUser(user)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User with id %s is not fount".formatted(user.getId())
+                )).describeConstable();
     }
 
     @Override
-    public ResponseEntity<Long> deleteUser(long id) {
-        // number of rows affected
-        int success = repository.deleteUser(id);
-        return success == 1 ? new ResponseEntity<>(HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public Long deleteUser(long id) {
+        return repository.deleteUser(id);
     }
 
     @Override
@@ -49,12 +61,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteAvatar(long id) {
-
+    public Long deleteAvatar(long id) {
+        return repository.deleteAvatar(id);
     }
 
     @Override
-    public long saveFullUser(User user) {
-        return 0;
+    public Long saveFullUser(User user) {
+        return repository.insertFullUser(user);
     }
 }

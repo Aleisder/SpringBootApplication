@@ -1,18 +1,14 @@
 package com.tsarenko.demo.api;
 
 import com.tsarenko.demo.model.User;
-import com.tsarenko.demo.repository.util.UserRowMapper;
+import com.tsarenko.demo.mapper.UserRowMapper;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashMap;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
