@@ -1,10 +1,11 @@
 package com.tsarenko.demo.repository;
 
-import com.tsarenko.demo.model.User;
 import com.tsarenko.demo.mapper.AvatarRowMapper;
+import com.tsarenko.demo.mapper.UserDTORowMapper;
+import com.tsarenko.demo.model.User;
+import com.tsarenko.demo.model.UserDTO;
 import com.tsarenko.demo.util.Query;
 import com.tsarenko.demo.util.UserMapSqlParameterSource;
-import com.tsarenko.demo.mapper.UserRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -17,20 +18,27 @@ import static com.tsarenko.demo.util.Query.*;
 public class UserRepository implements UserDao {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private final UserRowMapper userRowMapper;
 
-    public UserRepository(NamedParameterJdbcTemplate jdbcTemplate, UserRowMapper userRowMapper) {
+    private final UserDTORowMapper userDTORowMapper;
+    private final AvatarRowMapper avatarRowMapper;
+
+    public UserRepository(
+            NamedParameterJdbcTemplate jdbcTemplate,
+            UserDTORowMapper userDTORowMapper,
+            AvatarRowMapper avatarRowMapper
+    ) {
         this.jdbcTemplate = jdbcTemplate;
-        this.userRowMapper = userRowMapper;
+        this.userDTORowMapper = userDTORowMapper;
+        this.avatarRowMapper = avatarRowMapper;
     }
 
     @Override
-    public Optional<User> getUserById(long id) {
-        return jdbcTemplate.query(
+    public UserDTO getUserById(long id) {
+        return jdbcTemplate.queryForObject(
                 SELECT_USER,
                 new MapSqlParameterSource("id", id),
-                userRowMapper
-        ).stream().findFirst();
+                userDTORowMapper
+        );
     }
 
     @Override
@@ -61,11 +69,10 @@ public class UserRepository implements UserDao {
     }
 
     @Override
-    public Long deleteUser(long id) {
-        return jdbcTemplate.queryForObject(
+    public void deleteUser(long id) {
+        jdbcTemplate.update(
                 DELETE_USER,
-                new MapSqlParameterSource("id", id),
-                Long.class
+                new MapSqlParameterSource("id", id)
         );
     }
 
@@ -74,13 +81,13 @@ public class UserRepository implements UserDao {
         return jdbcTemplate.queryForObject(
                 SELECT_AVATAR,
                 new MapSqlParameterSource("id", id),
-                new AvatarRowMapper()
+                avatarRowMapper
         );
     }
 
     @Override
-    public void uploadAvatar(long id, byte[] image) {
-        var map = new MapSqlParameterSource("id", id).addValue("avatar", image);
+    public void updateAvatar(long id, byte[] file) {
+        var map = new MapSqlParameterSource("id", id).addValue("avatar", file);
         jdbcTemplate.update(Query.UPDATE_AVATAR, map);
     }
 

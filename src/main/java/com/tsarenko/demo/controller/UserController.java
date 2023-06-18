@@ -5,16 +5,15 @@ import com.tsarenko.demo.model.UserDTO;
 import com.tsarenko.demo.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
-public class UserController {
+public final class UserController {
 
     private final UserService service;
 
@@ -50,8 +49,8 @@ public class UserController {
      * При удалении профиля так же должна удаляться связанная с ним аватарка пользователя, если она загружена.
      */
     @DeleteMapping("/profile")
-    private Long deleteUser(@RequestParam long id) {
-        return service.deleteUser(id);
+    private void deleteUser(@RequestParam long id) {
+        service.deleteUser(id);
     }
 
     /**
@@ -61,7 +60,7 @@ public class UserController {
      */
     @GetMapping(
             value = "/avatar",
-            produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE}
+            produces = { MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE }
     )
     private @ResponseBody byte[] getUserAvatar(@RequestParam long id) {
         return service.getUserAvatar(id);
@@ -73,8 +72,11 @@ public class UserController {
      * Возвращаемое значение: http-код 200, если загрузка прошла успешно
      * или код 404, если пользователь с указанным id не найден.
      */
-    @PostMapping("/avatar")
-    private void uploadAvatar(@RequestParam long id, @RequestParam MultipartFile file) throws IOException {
+    @PostMapping(
+            value = "/avatar",
+            produces = { MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE }
+    )
+    private void uploadAvatar(@RequestParam long id, @RequestParam MultipartFile file) throws HttpMediaTypeNotSupportedException {
         service.uploadAvatar(id, file);
     }
 
@@ -96,8 +98,8 @@ public class UserController {
      * Возвращаемое значение: http-код 200 и id пользователя или код 404, если пользователь с указанным id отсутствует.
      */
     @PostMapping(
-            value = "/fullprofile",
-            produces = { MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE}
+            value = "/fullprofile"
+            //produces = { MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE }
     )
     private Long saveFullUser(@RequestBody User user) {
         return service.saveFullUser(user);

@@ -8,7 +8,6 @@ import javax.sql.DataSource;
 
 @Configuration
 public class DatabaseConfiguration {
-
     @Bean
     public NamedParameterJdbcTemplate getJdbcTemplate(DataSource dataSource) {
         return new NamedParameterJdbcTemplate(dataSource);
