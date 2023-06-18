@@ -1,6 +1,5 @@
 package com.tsarenko.demo.repository;
 
-import com.tsarenko.demo.mapper.AvatarRowMapper;
 import com.tsarenko.demo.mapper.UserDTORowMapper;
 import com.tsarenko.demo.model.User;
 import com.tsarenko.demo.model.UserDTO;
@@ -10,26 +9,20 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 import static com.tsarenko.demo.util.Query.*;
 
 @Repository
 public class UserRepository implements UserDao {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
-
     private final UserDTORowMapper userDTORowMapper;
-    private final AvatarRowMapper avatarRowMapper;
 
     public UserRepository(
             NamedParameterJdbcTemplate jdbcTemplate,
-            UserDTORowMapper userDTORowMapper,
-            AvatarRowMapper avatarRowMapper
+            UserDTORowMapper userDTORowMapper
     ) {
         this.jdbcTemplate = jdbcTemplate;
         this.userDTORowMapper = userDTORowMapper;
-        this.avatarRowMapper = avatarRowMapper;
     }
 
     @Override
@@ -51,21 +44,21 @@ public class UserRepository implements UserDao {
     }
 
     @Override
-    public Optional<Long> updateUser(User user) {
-        return Optional.ofNullable(
-                jdbcTemplate.queryForObject(
-                        UPDATE_USER,
-                        new UserMapSqlParameterSource(user),
-                        Long.class
-                )
+    public Long updateUser(User user) {
+        return jdbcTemplate.queryForObject(
+                UPDATE_USER,
+                new UserMapSqlParameterSource(user),
+                Long.class
         );
     }
 
     @Override
-    public boolean existsUserById(long id) {
-        String query = "select exists(select 1 from public.user where id = :id)";
-        var map = new MapSqlParameterSource("id", id);
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(query, map, Boolean.class));
+    public Boolean existsUserById(long id) {
+        return jdbcTemplate.queryForObject(
+                IF_USER_EXISTS,
+                new MapSqlParameterSource("id", id),
+                Boolean.class
+        );
     }
 
     @Override
@@ -77,17 +70,17 @@ public class UserRepository implements UserDao {
     }
 
     @Override
-    public byte[] getUserAvatar(long id) {
+    public String getUserAvatar(long id) {
         return jdbcTemplate.queryForObject(
                 SELECT_AVATAR,
                 new MapSqlParameterSource("id", id),
-                avatarRowMapper
+                String.class
         );
     }
 
     @Override
-    public void updateAvatar(long id, byte[] file) {
-        var map = new MapSqlParameterSource("id", id).addValue("avatar", file);
+    public void updateAvatar(long id, String encodedFile) {
+        var map = new MapSqlParameterSource("id", id).addValue("avatar", encodedFile);
         jdbcTemplate.update(Query.UPDATE_AVATAR, map);
     }
 

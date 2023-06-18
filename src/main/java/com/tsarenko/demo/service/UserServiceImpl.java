@@ -4,14 +4,9 @@ import com.tsarenko.demo.exception.UserNotFoundException;
 import com.tsarenko.demo.model.User;
 import com.tsarenko.demo.model.UserDTO;
 import com.tsarenko.demo.repository.UserDao;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.util.Base64;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,15 +24,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<Long> createOrUpdateUser(User user) {
+    public Long createOrUpdateUser(User user) {
         if (user.getId() == null) {
-            return Optional.of(repository.insertUser(user)) ;
+            return repository.insertUser(user) ;
         }
-        return repository
-                .updateUser(user)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User with id %s is not fount".formatted(user.getId())
-                )).describeConstable();
+        checkIfUserIdExistOrThrow(user.getId());
+        return repository.updateUser(user);
     }
 
     @Override
@@ -49,19 +41,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public byte[] getUserAvatar(long id) {
         checkIfUserIdExistOrThrow(id);
-        return repository.getUserAvatar(id);
+        return Base64
+                .getUrlDecoder()
+                .decode(repository.getUserAvatar(id)) ;
     }
 
     @Override
-    public void uploadAvatar(long id, MultipartFile file) throws HttpMediaTypeNotSupportedException {
-        if (!List.of(MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE).contains(file.getContentType()) ) {
-            throw new HttpMediaTypeNotSupportedException("Only JPEG and PNG are supported");
-        }
-        try {
-            repository.updateAvatar(id, file.getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to upload the user avatar", e);
-        }
+    public void uploadAvatar(long id, String encodedFile) {
+        checkIfUserIdExistOrThrow(id);
+        repository.updateAvatar(id, encodedFile);
     }
 
     @Override

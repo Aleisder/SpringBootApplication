@@ -7,7 +7,6 @@ public record UserDTO(
         String lastName,
         String firstName,
         String middleName,
-        LocalDate dateOfBirth,
-        byte[] avatar
+        LocalDate dateOfBirth
 ) {
 }

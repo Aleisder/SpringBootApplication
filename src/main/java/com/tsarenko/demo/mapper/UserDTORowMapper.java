@@ -16,8 +16,7 @@ public class UserDTORowMapper implements RowMapper<UserDTO> {
                 rs.getString(2),
                 rs.getString(3),
                 rs.getString(4),
-                rs.getDate(5).toLocalDate(),
-                rs.getBytes(6)
+                rs.getDate(5).toLocalDate()
         );
     }
 }

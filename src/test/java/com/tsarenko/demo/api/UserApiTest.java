@@ -1,7 +1,8 @@
 package com.tsarenko.demo.api;
 
+import com.tsarenko.demo.mapper.UserDTORowMapper;
 import com.tsarenko.demo.model.User;
-import com.tsarenko.demo.mapper.UserRowMapper;
+import com.tsarenko.demo.model.UserDTO;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,16 +40,16 @@ public class UserApiTest {
                 .log()
                 .all();
 
-        User actualUser = template.queryForObject(
+        UserDTO actualUser = template.queryForObject(
                 "SELECT * FROM public.user ORDER BY id DESK LIMIT 1",
                 new MapSqlParameterSource(),
-                new UserRowMapper()
+                new UserDTORowMapper()
         );
 
         assert actualUser != null;
 
         var expectedLastName = user.getLastName();
-        var actualLastName = actualUser.getLastName();
+        var actualLastName = actualUser.lastName();
 
         assertEquals(expectedLastName, actualLastName);
     }

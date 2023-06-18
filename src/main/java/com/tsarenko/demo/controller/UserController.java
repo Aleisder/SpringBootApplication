@@ -5,11 +5,11 @@ import com.tsarenko.demo.model.UserDTO;
 import com.tsarenko.demo.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
+import java.io.IOException;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/api")
@@ -39,7 +39,7 @@ public final class UserController {
      * Возвращаемое значение: http-код 200 и id пользователя или код 404, если пользователь с указанным id отсутствует.
      */
     @PostMapping("/profile")
-    private Optional<Long> createOrUpdateUser(@Valid @RequestBody User user) {
+    private Long createOrUpdateUser(@Valid @RequestBody User user) {
         return service.createOrUpdateUser(user);
     }
 
@@ -76,8 +76,11 @@ public final class UserController {
             value = "/avatar",
             produces = { MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE }
     )
-    private void uploadAvatar(@RequestParam long id, @RequestParam MultipartFile file) throws HttpMediaTypeNotSupportedException {
-        service.uploadAvatar(id, file);
+    private void uploadAvatar(@RequestParam long id, @RequestParam MultipartFile file) throws IOException {
+        String encodedUrl = Base64
+                .getUrlEncoder()
+                .encodeToString(file.getBytes());
+        service.uploadAvatar(id, encodedUrl);
     }
 
     /**
