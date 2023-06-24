@@ -12,12 +12,12 @@ import org.springframework.stereotype.Repository;
 import static com.tsarenko.demo.util.Query.*;
 
 @Repository
-public class UserRepository implements UserDao {
+public class UserRepositoryJDBC implements UserDao {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final UserDTORowMapper userDTORowMapper;
 
-    public UserRepository(
+    public UserRepositoryJDBC(
             NamedParameterJdbcTemplate jdbcTemplate,
             UserDTORowMapper userDTORowMapper
     ) {

@@ -3,16 +3,15 @@ package com.tsarenko.demo.controller;
 import com.tsarenko.demo.model.User;
 import com.tsarenko.demo.model.UserDTO;
 import com.tsarenko.demo.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.Base64;
-
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Пользователи", description = "Контроллер для работы с профилем пользователя и его аватаркой")
 public final class UserController {
 
     private final UserService service;
@@ -28,7 +27,8 @@ public final class UserController {
      * или код 404, если пользователь с указанным id не найден
      */
     @GetMapping("/profile")
-    private UserDTO getUser(@RequestParam long id) {
+    //@Operation(summary = "Получение профиля пользователя")
+    public UserDTO getUser(@RequestParam long id) {
         return service.getUser(id);
     }
 
@@ -39,7 +39,7 @@ public final class UserController {
      * Возвращаемое значение: http-код 200 и id пользователя или код 404, если пользователь с указанным id отсутствует.
      */
     @PostMapping("/profile")
-    private Long createOrUpdateUser(@Valid @RequestBody User user) {
+    public Long createOrUpdateUser(@Valid @RequestBody User user) {
         return service.createOrUpdateUser(user);
     }
 
@@ -49,7 +49,7 @@ public final class UserController {
      * При удалении профиля так же должна удаляться связанная с ним аватарка пользователя, если она загружена.
      */
     @DeleteMapping("/profile")
-    private void deleteUser(@RequestParam long id) {
+    public void deleteUser(@RequestParam long id) {
         service.deleteUser(id);
     }
 
@@ -62,7 +62,7 @@ public final class UserController {
             value = "/avatar",
             produces = { MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE }
     )
-    private @ResponseBody byte[] getUserAvatar(@RequestParam long id) {
+    public @ResponseBody byte[] getUserAvatar(@RequestParam long id) {
         return service.getUserAvatar(id);
     }
 
@@ -72,15 +72,9 @@ public final class UserController {
      * Возвращаемое значение: http-код 200, если загрузка прошла успешно
      * или код 404, если пользователь с указанным id не найден.
      */
-    @PostMapping(
-            value = "/avatar",
-            produces = { MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE }
-    )
-    private void uploadAvatar(@RequestParam long id, @RequestParam MultipartFile file) throws IOException {
-        String encodedUrl = Base64
-                .getUrlEncoder()
-                .encodeToString(file.getBytes());
-        service.uploadAvatar(id, encodedUrl);
+    @PostMapping(value = "/avatar")
+    public void uploadAvatar(@RequestParam long id, @RequestParam MultipartFile file) {
+        service.uploadAvatar(id, file);
     }
 
     /**
@@ -90,7 +84,7 @@ public final class UserController {
      * или код 404, если пользователь с указанным id не найден.
      */
     @DeleteMapping("/avatar")
-    private Long deleteAvatar(@RequestParam long id) {
+    public Long deleteAvatar(@RequestParam long id) {
         return service.deleteAvatar(id);
     }
 
@@ -100,12 +94,9 @@ public final class UserController {
      * то выполняется обновление существующего профиля, если id осутствует - создаётся новый профиль.
      * Возвращаемое значение: http-код 200 и id пользователя или код 404, если пользователь с указанным id отсутствует.
      */
-    @PostMapping(
-            value = "/fullprofile"
-            //produces = { MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE }
-    )
-    private Long saveFullUser(@RequestBody User user) {
-        return service.saveFullUser(user);
+    @PostMapping(value = "/fullprofile")
+    public Long saveFullUser(@RequestBody User user, @RequestParam MultipartFile file) {
+        return service.saveFullUser(user, file);
     }
 
 }

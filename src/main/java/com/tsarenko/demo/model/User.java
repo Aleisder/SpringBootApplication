@@ -25,7 +25,7 @@ public class User {
     @NotNull
     private LocalDate dateOfBirth;
 
-    private byte[] avatar;
+    private String avatar;
 
     public User() {
     }
@@ -43,14 +43,9 @@ public class User {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public User(String lastName, String firstName, String middleName, LocalDate dateOfBirth, byte[] avatar) {
+    public User(String lastName, String firstName, String middleName, LocalDate dateOfBirth, String avatar) {
         this(lastName, firstName, middleName, dateOfBirth);
         this.avatar = avatar;
-    }
-
-    @JsonIgnore
-    public boolean isEmpty() {
-        return id == null;
     }
 
 }
