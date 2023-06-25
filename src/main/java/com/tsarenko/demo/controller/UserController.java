@@ -25,26 +25,35 @@ public final class UserController {
     }
 
     @GetMapping("/profile")
-    @Operation(summary = "Получение профиля пользователя")
+    @Operation(
+            summary = "Получение профиля пользователя",
+            description = "Сервер возаращает http-код 200 и json с профилем пользователя, если получение данных прошло успешно, или код 404, если пользователь с указанным id не найден"
+    )
     public UserDTO getUser(@RequestParam long id) {
         return service.getUser(id);
     }
 
     @PostMapping("/profile")
-    @Operation(summary = "Cоздание/изменение профиля пользователя")
+    @Operation(
+            summary = "Cоздание/изменение профиля пользователя",
+            description = "Если id пользователя заполнен, то выполняется обновление существующего профиля, если id осутствует - создаётся новый профиль. Возвращаемое значение: http-код 200 и id пользователя или код 404, если пользователь с указанным id отсутствует."
+    )
     public Long createOrUpdateUser(@Valid @RequestBody User user) {
         return service.createOrUpdateUser(user);
     }
 
     @DeleteMapping("/profile")
-    @Operation(summary = "Удаление профиля пользователя")
+    @Operation(
+            summary = "Удаление профиля пользователя",
+            description = ""
+    )
     public void deleteUser(@RequestParam long id) {
         service.deleteUser(id);
     }
 
     @GetMapping(
             value = "/avatar",
-            produces = { MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE }
+            produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_JPEG_VALUE}
     )
     @Operation(summary = "Получить аватарку пользователя")
     public @ResponseBody byte[] getUserAvatar(@RequestParam long id) {
@@ -53,10 +62,10 @@ public final class UserController {
 
     @PostMapping(
             value = "/avatar",
-            consumes = { MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE }
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @Operation(summary = "Загрузить аватарку пользователя")
-    public void uploadAvatar(@RequestParam long id, @RequestBody MultipartFile file) {
+    public void uploadAvatar(@RequestParam long id, @RequestParam MultipartFile file) {
         service.uploadAvatar(id, file);
     }
 
@@ -66,9 +75,12 @@ public final class UserController {
         return service.deleteAvatar(id);
     }
 
-    @PostMapping(value = "/fullprofile")
+    @PostMapping(
+            value = "/fullprofile",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     @Operation(summary = "Cохранение профиля пользователя вместе с аватаркой")
-    public Long saveFullUser(@RequestBody User user, @RequestParam MultipartFile file) {
+    public Long saveFullUser(@RequestBody User user, @RequestBody MultipartFile file) {
         return service.saveFullUser(user, file);
     }
 

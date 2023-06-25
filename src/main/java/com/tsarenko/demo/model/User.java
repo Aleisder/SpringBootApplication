@@ -25,6 +25,7 @@ public class User {
     @NotNull
     private LocalDate dateOfBirth;
 
+    @JsonIgnore
     private String avatar;
 
     public User() {

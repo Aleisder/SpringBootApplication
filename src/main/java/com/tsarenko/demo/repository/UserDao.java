@@ -9,6 +9,7 @@ public interface UserDao {
     Long updateUser(User user);
     Boolean existsUserById(long id);
     void deleteUser(long id);
+    Boolean existAvatarById(long id);
     String getUserAvatar(long id);
     void updateAvatar(long id, String encodedFile);
     Long deleteAvatar(long id);

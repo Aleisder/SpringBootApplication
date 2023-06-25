@@ -5,7 +5,6 @@ import com.tsarenko.demo.model.User;
 import com.tsarenko.demo.model.UserDTO;
 import com.tsarenko.demo.repository.UserDao;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -48,7 +47,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public byte[] getUserAvatar(long id) {
-        validator.validateUserId(id);
+        validator
+                .validateUserId(id)
+                .validateUserHasAvatar(id);
         return Base64
                 .getUrlDecoder()
                 .decode(repository.getUserAvatar(id));
@@ -82,10 +83,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long saveFullUser(User user, @RequestParam MultipartFile file) {
+    public Long saveFullUser(User user, MultipartFile file) {
         String image = encodeUrlToBase64(file);
         user.setAvatar(image);
-        return repository.insertFullUser(user);
+        // if user doesn't exist
+        if (user.getId() == null) {
+            return repository.insertFullUser(user);
+        }
+        validator
+                .validateUserId(user.getId())
+                .validateUserAge(user.getDateOfBirth());
+        return repository.updateUser(user);
     }
 
 }

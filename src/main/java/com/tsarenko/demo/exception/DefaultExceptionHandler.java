@@ -15,7 +15,8 @@ public class DefaultExceptionHandler {
             UserNotFoundException.class,
             MediaTypeException.class,
             FileIsTooBigException.class,
-            UserUnderageException.class
+            UserUnderageException.class,
+            FileNotFoundException.class
     })
     public ResponseEntity<ErrorBody> handleException(RuntimeException e, HttpServletRequest request) {
 

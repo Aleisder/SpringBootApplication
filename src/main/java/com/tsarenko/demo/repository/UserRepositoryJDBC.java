@@ -70,6 +70,15 @@ public class UserRepositoryJDBC implements UserDao {
     }
 
     @Override
+    public Boolean existAvatarById(long id) {
+        return jdbcTemplate.queryForObject(
+                IF_AVATAR_EXISTS,
+                new MapSqlParameterSource("id", id),
+                Boolean.class
+        );
+    }
+
+    @Override
     public String getUserAvatar(long id) {
         return jdbcTemplate.queryForObject(
                 SELECT_AVATAR,

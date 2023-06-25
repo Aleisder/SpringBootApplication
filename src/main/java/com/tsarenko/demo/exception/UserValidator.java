@@ -41,6 +41,7 @@ public class UserValidator {
     }
 
     public UserValidator validateFileType(MultipartFile file) {
+        System.out.println(file);
         var supportedTypes = List.of(MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE);
         if (!supportedTypes.contains(file.getContentType())) {
             throw new MediaTypeException(
@@ -53,6 +54,13 @@ public class UserValidator {
     public UserValidator validateFileSize(MultipartFile file) {
         if (file.getSize() > 2 * 1024 * 1024) {
             throw new FileIsTooBigException("file is too big (> 2MB)");
+        }
+        return this;
+    }
+
+    public UserValidator validateUserHasAvatar(long id) {
+        if (!repository.existAvatarById(id)) {
+            throw new FileNotFoundException("avatar for user with id %s is not found".formatted(id));
         }
         return this;
     }
