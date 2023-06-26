@@ -45,7 +45,7 @@ public final class UserController {
     @DeleteMapping("/profile")
     @Operation(
             summary = "Удаление профиля пользователя",
-            description = ""
+            description = "Входные параметры: id пользователя. Возвращаемое значение: http-код 200, если удаление данных прошло успешно, или код 404, если пользователь с указанным id не найден. При удалении профиля так же должна удаляться связанная с ним аватарка пользователя, если она загружена."
     )
     public void deleteUser(@RequestParam long id) {
         service.deleteUser(id);
@@ -55,7 +55,10 @@ public final class UserController {
             value = "/avatar",
             produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_JPEG_VALUE}
     )
-    @Operation(summary = "Получить аватарку пользователя")
+    @Operation(
+            summary = "Получить аватарку пользователя",
+            description = "Входные параметры: id пользователя. Возвращаемое значение: http-код 200 и файл с аватаркой пользователя, если получение данных прошло успешно, или код 404, если пользователь с указанным id не найден или для пользователя не загружена аватарка."
+    )
     public @ResponseBody byte[] getUserAvatar(@RequestParam long id) {
         return service.getUserAvatar(id);
     }
@@ -64,13 +67,19 @@ public final class UserController {
             value = "/avatar",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    @Operation(summary = "Загрузить аватарку пользователя")
+    @Operation(
+            summary = "Загрузить аватарку пользователя",
+            description = "Входные параметры: id пользователя и файл аватарки. Возвращаемое значение: http-код 200, если загрузка прошла успешно или код 404, если пользователь с указанным id не найден."
+    )
     public void uploadAvatar(@RequestParam long id, @RequestParam MultipartFile file) {
         service.uploadAvatar(id, file);
     }
 
     @DeleteMapping("/avatar")
-    @Operation(summary = "Удалить аватарку пользователя")
+    @Operation(
+            summary = "Удалить аватарку пользователя",
+            description = "Входные параметры: id пользователя. Возвращаемое значение: http-код 200, если удаление прошло успешно или код 404, если пользователь с указанным id не найден."
+    )
     public Long deleteAvatar(@RequestParam long id) {
         return service.deleteAvatar(id);
     }
@@ -79,8 +88,11 @@ public final class UserController {
             value = "/fullprofile",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    @Operation(summary = "Cохранение профиля пользователя вместе с аватаркой")
-    public Long saveFullUser(@RequestBody User user, @RequestBody MultipartFile file) {
+    @Operation(
+            summary = "Cохранение профиля пользователя вместе с аватаркой",
+            description = "Входные параметры: json с профилем пользователя и файл аватарки. Если id пользователя заполнен, то выполняется обновление существующего профиля, если id осутствует - создаётся новый профиль. Возвращаемое значение: http-код 200 и id пользователя или код 404, если пользователь с указанным id отсутствует."
+    )
+    public Long saveFullUser(User user, @RequestParam MultipartFile file) {
         return service.saveFullUser(user, file);
     }
 
