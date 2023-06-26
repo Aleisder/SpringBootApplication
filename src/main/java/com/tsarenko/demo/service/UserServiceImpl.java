@@ -85,14 +85,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long saveFullUser(User user, MultipartFile file) {
         String image = encodeUrlToBase64(file);
+        validator.validateUserAge(user.getDateOfBirth());
         user.setAvatar(image);
         // if user doesn't exist
         if (user.getId() == null) {
             return repository.insertFullUser(user);
         }
-        validator
-                .validateUserId(user.getId())
-                .validateUserAge(user.getDateOfBirth());
+        validator.validateUserId(user.getId());
         return repository.updateUser(user);
     }
 
