@@ -11,14 +11,11 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class DefaultExceptionHandler {
 
-    @ExceptionHandler(value = {
+    @ExceptionHandler({
             UserNotFoundException.class,
-            MediaTypeException.class,
-            FileIsTooBigException.class,
-            UserUnderageException.class,
             FileNotFoundException.class
     })
-    public ResponseEntity<ErrorBody> handleException(RuntimeException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorBody> handleNotFoundException(RuntimeException e, HttpServletRequest request) {
 
         var error = new ErrorBody(
                 LocalDateTime.now(),
@@ -27,6 +24,21 @@ public class DefaultExceptionHandler {
                 request.getRequestURI()
         );
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({
+            MediaTypeException.class,
+            FileIsTooBigException.class,
+            UserUnderageException.class
+    })
+    public ResponseEntity<ErrorBody> handleBadRequestException(RuntimeException e, HttpServletRequest request) {
+        var error = new ErrorBody(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                e.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
 }
